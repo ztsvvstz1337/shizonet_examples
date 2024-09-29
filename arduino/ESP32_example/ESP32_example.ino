@@ -74,6 +74,7 @@ void setup() {
   client.setArtDmxCallback([](uint16_t universe, uint16_t length, uint8_t sequence, uint8_t* data, shznet_ip remoteIP)
   {
     //Receive a DMX universe frame and do something with it
+    //This is the place to memcpy LED data into the LED buffer for example
   });
 
   //Show LEDS, update frame whatever
@@ -156,6 +157,28 @@ void setup() {
 
   //MORE ADVANCED FEATURES, SENDING DIFFERENT DATA TYPES ETC...
   //TODO...
+  //Basic example of making a "poll" sensor command with a key value parameter list
+  client.add_command_respond("sensor_example", [](std::shared_ptr<shznet_responder> responder)
+  {
+    //check if the incoming data is a key-value map
+    if(responder->format() != SHZNET_PKT_FMT_KEY_VALUE)
+    {
+      Serial.println("Received invalid format!");
+      return;
+    }
+
+    shznet_kv_reader kvr(responder->data(), responder->size());
+
+    Serial.printf("Sensor name: %s\n", kvr.read_string("sensor_name"));
+    Serial.printf("Sensor index: %i\n", kvr.read_int32("sensor_index"));
+
+    //Respond with test data:
+    shznet_kv_writer kvw;
+    kvw.add_string("State", "success");
+    kvw.add_int32("value1", 1337);
+    kvw.add_float32("value2", 13.37);
+    responder->respond(kvw);
+  });
 
   Serial.print("Mem: ");
   Serial.println(ESP.getFreeHeap());
