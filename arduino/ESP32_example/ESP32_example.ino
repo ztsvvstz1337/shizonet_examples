@@ -134,10 +134,10 @@ void setup() {
 
     std::string response = "Hello reliable!";
 
-    dev->send_unreliable("test_reliable_respond",   /*The command for the sender*/
-            response.c_str(),                     /*The data to be sent*/
+    dev->send_unreliable("test_unreliable_respond",   /*The command for the sender*/
+            (byte*)response.c_str(),                /*The data to be sent*/
             response.length(),                    /*The size of the data*/
-            SHZNET_PKT_FMT_STRING,                /*The format of the data*/
+            SHZNET_PKT_FMT_STRING                 /*The format of the data*/
           );
   });
 
